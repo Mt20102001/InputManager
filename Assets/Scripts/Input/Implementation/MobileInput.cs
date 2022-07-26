@@ -11,5 +11,13 @@ public class MobileInput : MonoBehaviour, IInputProfile
     public float Vertical => 0;
     public bool Fire => false;
 
+    public bool Jump => throw new System.NotImplementedException();
 
+    public float HorizontalCamera => throw new System.NotImplementedException();
+
+    public float VerticalCamera => throw new System.NotImplementedException();
+
+    public string InputAxisNameCurrentOfXForCamera => throw new System.NotImplementedException();
+
+    public string InputAxisNameCurrentOfYForCamera => throw new System.NotImplementedException();
 }

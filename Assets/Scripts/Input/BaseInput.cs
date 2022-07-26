@@ -18,6 +18,11 @@ public interface IInputProfile
     float Horizontal { get; }
     float Vertical { get; }
     bool Fire { get; }
+    bool Jump { get; }
+    float HorizontalCamera { get; }
+    float VerticalCamera { get; }
+    string InputAxisNameCurrentOfXForCamera { get; }
+    string InputAxisNameCurrentOfYForCamera { get; }
 
 }
 
