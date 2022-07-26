@@ -4,13 +4,9 @@ using UnityEngine;
 
 public class TestController : MonoBehaviour
 {
-    [SerializeField] private PlayerController player;
-
     void Start()
     {
         GameInputManager.Instance.Initialize();
-        player = GameObject.FindObjectOfType<PlayerController>();
-        player.Initialize();
     }
 
     // Update is called once per frame
