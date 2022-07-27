@@ -13,11 +13,14 @@ public class DesktopInput : MonoBehaviour, IInputProfile
 
     public bool Jump => Input.GetKeyDown(KeyCode.Space);
 
+    public bool Run => Input.GetKey(KeyCode.LeftShift);
+
     public float HorizontalCamera => Input.GetAxis("K_HorizontalCamera");
 
     public float VerticalCamera => Input.GetAxis("K_VerticalCamera");
 
-    public string InputAxisNameCurrentOfXForCamera => "K_HorizontalCamera";
+    public string InputAxisNameCurrentOfXForCamera => "Mouse X";
 
-    public string InputAxisNameCurrentOfYForCamera => "K_VerticalCamera";
+    public string InputAxisNameCurrentOfYForCamera => "Mouse Y";
+
 }

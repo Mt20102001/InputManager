@@ -7,6 +7,7 @@ public class TestController : MonoBehaviour
     void Start()
     {
         GameInputManager.Instance.Initialize();
+        Test02();
     }
 
     // Update is called once per frame
@@ -30,6 +31,8 @@ public class TestController : MonoBehaviour
     public void Test02()
     {
         GameInputManager.Instance.SwitchProfile(InputType.DESKTOP);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         Debug.LogError("switch desktop");
     }
 

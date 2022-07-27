@@ -14,6 +14,8 @@ public class ControllerInput : MonoBehaviour, IInputProfile
 
     public bool Jump => Input.GetButtonDown("Y_Button");
 
+    public bool Run => Input.GetAxis("LT") > 0;
+
     public float HorizontalCamera => Input.GetAxis("J_RightHorizontal");
 
     public float VerticalCamera => Input.GetAxis("J_RightVertical");
@@ -21,4 +23,5 @@ public class ControllerInput : MonoBehaviour, IInputProfile
     public string InputAxisNameCurrentOfXForCamera => "J_RightHorizontal";
 
     public string InputAxisNameCurrentOfYForCamera => "J_RightVertical";
+
 }

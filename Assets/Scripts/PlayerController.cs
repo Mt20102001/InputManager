@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     // [SerializeField] private Rigidbody rbPlayer;
     [SerializeField] private CharacterController characterControllerPlayer;
+    [SerializeField] private Animator animatorPlayer;
     [SerializeField] private CreateBulletPooling FireBullet;
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
@@ -13,12 +14,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform AttackPoint;
     [SerializeField] private Transform cam;
     [SerializeField] private float turnSmoothTime;
+    [SerializeField] private float gravity;
 
     private float directionY;
-    private float gravity = 10f;
     private Vector3 movement;
     private Vector3 moveDir;
     private float turnSmoothVelocity;
+    private float axisRun;
     private bool isGrounded;
 
     // Update is called once per frame
@@ -29,25 +31,49 @@ public class PlayerController : MonoBehaviour
         // -- Movement
         movement = new Vector3(GameInputManager.Instance.CurrentProfile.Horizontal, 0, GameInputManager.Instance.CurrentProfile.Vertical);
         Vector3 direction = movement.normalized;
-        
+
         if (direction.magnitude >= 0.1f)
         {
+            // animatorPlayer.applyRootMotion = false;
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
             transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
 
             moveDir = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
+
+            animatorPlayer.SetFloat("Vertical", moveDir.magnitude);
+
+            if (GameInputManager.Instance.CurrentProfile.Run)
+            {
+                float smoothDampRunUp = Mathf.Lerp(animatorPlayer.GetFloat("Run"), 1, 0.1f);
+                animatorPlayer.SetFloat("Run", smoothDampRunUp);
+            }
+            else
+            {
+                float smoothDampRunDown = Mathf.Lerp(animatorPlayer.GetFloat("Run"), 0, 0.1f);
+                animatorPlayer.SetFloat("Run", smoothDampRunDown);
+            }
+
             characterControllerPlayer.Move(moveDir.normalized * moveSpeed * Time.deltaTime);
+        }
+        else
+        {
+            // animatorPlayer.applyRootMotion = true;
+            float smoothDampVerticalDOWN = Mathf.Lerp(animatorPlayer.GetFloat("Vertical"), 0, 0.1f);
+            animatorPlayer.SetFloat("Vertical", smoothDampVerticalDOWN);
+            animatorPlayer.SetFloat("Run", smoothDampVerticalDOWN);
         }
 
         // -- Jump
-        if (GameInputManager.Instance.CurrentProfile.Jump && isGrounded)
+        if (animatorPlayer.GetBool("Jumping") == false)
         {
-            directionY = jumpForce;
-            moveDir.x = 0;
-            moveDir.z = 0;
+            if (GameInputManager.Instance.CurrentProfile.Jump && isGrounded)
+            {
+                directionY = jumpForce;
+                moveDir.x = 0;
+                moveDir.z = 0;
+            }
         }
-
         directionY -= gravity * Time.deltaTime;
         moveDir.y = directionY;
         characterControllerPlayer.Move(moveDir.normalized * moveSpeed * Time.deltaTime);
@@ -64,6 +90,14 @@ public class PlayerController : MonoBehaviour
     {
         RaycastHit hit;
         isGrounded = Physics.Raycast(transform.position, -transform.up, out hit, 0.2f, groundLayer);
+        if (isGrounded)
+        {
+            animatorPlayer.SetBool("Jumping", false);
+        }
+        else
+        {
+            animatorPlayer.SetBool("Jumping", true);
+        }
     }
 
 }
