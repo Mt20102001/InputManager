@@ -313,7 +313,9 @@ MonoBehaviour:
   characterControllerPlayer: {fileID: 5244364321972308229}
   animatorPlayer: {fileID: 443963783}
   FireBullet: {fileID: 0}
-  moveSpeed: 10
+  animJumpController: {fileID: 980887900}
+  moveSpeed: 5
+  runSpeed: 15
   jumpForce: 5
   groundLayer:
     serializedVersion: 2
@@ -431,3 +433,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400154, guid: bdd7a03fd93bf2d4cb6babd63ceabee8, type: 3}
   m_PrefabInstance: {fileID: 451325159}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &451357661 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100154, guid: bdd7a03fd93bf2d4cb6babd63ceabee8, type: 3}
+  m_PrefabInstance: {fileID: 451325159}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &980887900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451357661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3447ac82388446142bca5ec3948b1001, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startJump: 0

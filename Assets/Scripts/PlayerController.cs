@@ -8,7 +8,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private CharacterController characterControllerPlayer;
     [SerializeField] private Animator animatorPlayer;
     [SerializeField] private CreateBulletPooling FireBullet;
+    [SerializeField] private AnimJumpController animJumpController;
     [SerializeField] private float moveSpeed;
+    [SerializeField] private float runSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform AttackPoint;
@@ -17,11 +19,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity;
 
     private float directionY;
+    private float speed;
     private Vector3 movement;
     private Vector3 moveDir;
     private float turnSmoothVelocity;
     private float axisRun;
     private bool isGrounded;
+
+
 
     // Update is called once per frame
     private void Update()
@@ -47,14 +52,16 @@ public class PlayerController : MonoBehaviour
             {
                 float smoothDampRunUp = Mathf.Lerp(animatorPlayer.GetFloat("Run"), 1, 0.1f);
                 animatorPlayer.SetFloat("Run", smoothDampRunUp);
+                speed = runSpeed;
             }
             else
             {
                 float smoothDampRunDown = Mathf.Lerp(animatorPlayer.GetFloat("Run"), 0, 0.1f);
                 animatorPlayer.SetFloat("Run", smoothDampRunDown);
+                speed = moveSpeed;
             }
 
-            characterControllerPlayer.Move(moveDir.normalized * moveSpeed * Time.deltaTime);
+            characterControllerPlayer.Move(moveDir.normalized * speed * Time.deltaTime);
         }
         else
         {
@@ -65,18 +72,24 @@ public class PlayerController : MonoBehaviour
         }
 
         // -- Jump
+
+
         if (animatorPlayer.GetBool("Jumping") == false)
         {
             if (GameInputManager.Instance.CurrentProfile.Jump && isGrounded)
             {
-                directionY = jumpForce;
-                moveDir.x = 0;
-                moveDir.z = 0;
+                if (animJumpController.startJump)
+                {
+                    directionY = jumpForce;
+                    moveDir.x = 0;
+                    moveDir.z = 0;
+                    animJumpController.startJump = false;
+                }
             }
         }
         directionY -= gravity * Time.deltaTime;
         moveDir.y = directionY;
-        characterControllerPlayer.Move(moveDir.normalized * moveSpeed * Time.deltaTime);
+        characterControllerPlayer.Move(moveDir.normalized * speed * Time.deltaTime);
 
         // -- Fire
         // if (GameInputManager.Instance.CurrentProfile.Fire)
