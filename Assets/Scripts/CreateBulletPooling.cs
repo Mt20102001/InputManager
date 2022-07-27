@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class CreateBulletPooling : MonoBehaviour
 {
-    public static CreateBulletPooling Instance
-    {
-        get
-        {
-            if (instance == null)
-                instance = FindObjectOfType<CreateBulletPooling>();
-            return instance;
-        }
-    }
+    // public static CreateBulletPooling Instance
+    // {
+    //     get
+    //     {
+    //         if (instance == null)
+    //             instance = FindObjectOfType<CreateBulletPooling>();
+    //         return instance;
+    //     }
+    // }
 
-    private static CreateBulletPooling instance;
+    // private static CreateBulletPooling instance;
     [SerializeField] private GameObject bullet;
     private List<GameObject> bulletPool = new List<GameObject>();
 

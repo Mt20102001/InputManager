@@ -11,7 +11,7 @@ public class DesktopInput : MonoBehaviour, IInputProfile
 
     public bool Fire => Input.GetMouseButtonDown(0);
 
-    public bool Jump => Input.GetKeyDown(KeyCode.Backspace);
+    public bool Jump => Input.GetKeyDown(KeyCode.Space);
 
     public float HorizontalCamera => Input.GetAxis("K_HorizontalCamera");
 
