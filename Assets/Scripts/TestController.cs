@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class TestController : MonoBehaviour
 {
+    
+
     void Start()
     {
         GameInputManager.Instance.Initialize();

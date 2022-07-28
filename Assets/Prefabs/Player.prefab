@@ -311,7 +311,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterControllerPlayer: {fileID: 5244364321972308229}
-  animatorPlayer: {fileID: 443963783}
   FireBullet: {fileID: 0}
   animJumpController: {fileID: 980887900}
   moveSpeed: 5
@@ -451,3 +450,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startJump: 0
+  endJump: 0
+  startLanding: 0
+--- !u!114 &8161677361492537915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451357661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3adaad310ed46cc48a0201a0908b71c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerController: {fileID: 3084672213077570020}
+  animatorPlayer: {fileID: 443963783}

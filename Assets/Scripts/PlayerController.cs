@@ -6,7 +6,6 @@ public class PlayerController : MonoBehaviour
 {
     // [SerializeField] private Rigidbody rbPlayer;
     [SerializeField] private CharacterController characterControllerPlayer;
-    [SerializeField] private Animator animatorPlayer;
     [SerializeField] private CreateBulletPooling FireBullet;
     [SerializeField] private AnimJumpController animJumpController;
     [SerializeField] private float moveSpeed;
@@ -26,9 +25,22 @@ public class PlayerController : MonoBehaviour
     private float axisRun;
     private bool isGrounded, isJumping, isLanding, canPressJumpBtn;
 
+    public event System.Action<string, float> OnMove;
+    public event System.Action<string> OnRun;
+    public event System.Action OnJump;
+    public event System.Action<string> OnStatusJump;
+
     private void Start()
     {
         canPressJumpBtn = true;
+    }
+
+    public void ClearEvent()
+    {
+        OnMove = null;
+        OnRun = null;
+        OnJump = null;
+        OnStatusJump = null;
     }
 
     // Update is called once per frame
@@ -52,18 +64,16 @@ public class PlayerController : MonoBehaviour
 
                 moveDir = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
 
-                animatorPlayer.SetFloat("Vertical", moveDir.magnitude);
+                OnMove?.Invoke("Up", moveDir.magnitude);
 
                 if (GameInputManager.Instance.CurrentProfile.Run)
                 {
-                    float smoothDampRunUp = Mathf.Lerp(animatorPlayer.GetFloat("Run"), 1, 0.1f);
-                    animatorPlayer.SetFloat("Run", smoothDampRunUp);
+                    OnRun?.Invoke("Up");
                     speed = runSpeed;
                 }
                 else
                 {
-                    float smoothDampRunDown = Mathf.Lerp(animatorPlayer.GetFloat("Run"), 0, 0.1f);
-                    animatorPlayer.SetFloat("Run", smoothDampRunDown);
+                    OnRun?.Invoke("Down");
                     speed = moveSpeed;
                 }
 
@@ -71,15 +81,13 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                // animatorPlayer.applyRootMotion = true;
-                float smoothDampVerticalDOWN = Mathf.Lerp(animatorPlayer.GetFloat("Vertical"), 0, 0.1f);
-                animatorPlayer.SetFloat("Vertical", smoothDampVerticalDOWN);
-                animatorPlayer.SetFloat("Run", smoothDampVerticalDOWN);
+                OnMove?.Invoke("Down", 0);
+                OnRun?.Invoke("Down");
             }
         }
 
         // -- Jump
-        if (animatorPlayer.GetBool("Jumping") == false && canPressJumpBtn)
+        if (canPressJumpBtn)
         {
             if (GameInputManager.Instance.CurrentProfile.Jump && isGrounded)
             {
@@ -102,7 +110,8 @@ public class PlayerController : MonoBehaviour
     private IEnumerator StartJump()
     {
         isJumping = true;
-        animatorPlayer.SetTrigger("Jump");
+        
+        OnJump?.Invoke();
         yield return new WaitUntil(() => animJumpController.startJump == true);
         directionY = jumpForce;
         moveDir.x = 0;
@@ -124,11 +133,11 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics.Raycast(transform.position, -transform.up, out hit, 0.2f, groundLayer);
         if (isGrounded)
         {
-            animatorPlayer.SetBool("Jumping", false);
+            OnStatusJump?.Invoke("IsGround");
         }
         else
-        {
-            animatorPlayer.SetBool("Jumping", true);
+        {   
+            OnStatusJump?.Invoke("OnAir");
         }
     }
 
