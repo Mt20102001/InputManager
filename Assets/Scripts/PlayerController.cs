@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    // [SerializeField] private Rigidbody rbPlayer;
     [SerializeField] private CharacterController characterControllerPlayer;
     [SerializeField] private CreateBulletPooling FireBullet;
     [SerializeField] private AnimJumpController animJumpController;
+    [SerializeField] private CinemachineCameraOffset cinemachineCameraOffsetPlayer;
+    [SerializeField] private GameObject aimImg;
     [SerializeField] private float moveSpeed;
     [SerializeField] private float runSpeed;
     [SerializeField] private float jumpForce;
@@ -22,8 +23,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 movement;
     private Vector3 moveDir;
     private float turnSmoothVelocity;
-    private float axisRun;
     private bool isGrounded, isJumping, isLanding, canPressJumpBtn;
+    private float targetAngle;
+    private float angle;
 
     public event System.Action<string, float> OnMove;
     public event System.Action<string> OnRun;
@@ -57,10 +59,8 @@ public class PlayerController : MonoBehaviour
         {
             if (direction.magnitude >= 0.1f)
             {
-                // animatorPlayer.applyRootMotion = false;
-                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
-                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-                transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+                targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+                angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
 
                 moveDir = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
 
@@ -86,6 +86,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+
         // -- Jump
         if (canPressJumpBtn)
         {
@@ -99,6 +100,26 @@ public class PlayerController : MonoBehaviour
         moveDir.y = directionY;
         characterControllerPlayer.Move(moveDir.normalized * speed * Time.deltaTime);
 
+        // -- Aim
+        if (GameInputManager.Instance.CurrentProfile.Aim)
+        {
+            transform.rotation = Quaternion.Euler(0.0f, cam.eulerAngles.y, 0.0f);
+            cinemachineCameraOffsetPlayer.m_Offset = Vector3.MoveTowards(cinemachineCameraOffsetPlayer.m_Offset, new Vector3(0.76f, -0.18f, 9.16f), 0.1f);
+            if (!aimImg.activeSelf)
+            {
+                //aimImg.SetActive(true);
+            }
+        }
+        else
+        {
+            transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+            cinemachineCameraOffsetPlayer.m_Offset = Vector3.MoveTowards(cinemachineCameraOffsetPlayer.m_Offset, Vector3.zero, 0.1f);
+            if (aimImg.activeSelf)
+            {
+                //aimImg.SetActive(false);
+            }
+        }
+
         // -- Fire
         // if (GameInputManager.Instance.CurrentProfile.Fire)
         // {
@@ -110,7 +131,7 @@ public class PlayerController : MonoBehaviour
     private IEnumerator StartJump()
     {
         isJumping = true;
-        
+
         OnJump?.Invoke();
         yield return new WaitUntil(() => animJumpController.startJump == true);
         directionY = jumpForce;
@@ -136,7 +157,7 @@ public class PlayerController : MonoBehaviour
             OnStatusJump?.Invoke("IsGround");
         }
         else
-        {   
+        {
             OnStatusJump?.Invoke("OnAir");
         }
     }

@@ -20,6 +20,7 @@ public interface IInputProfile
     bool Fire { get; }
     bool Jump { get; }
     bool Run { get; }
+    bool Aim { get; }
     float HorizontalCamera { get; }
     float VerticalCamera { get; }
     string InputAxisNameCurrentOfXForCamera { get; }

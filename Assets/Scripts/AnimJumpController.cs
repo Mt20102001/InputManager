@@ -43,12 +43,10 @@ public class AnimJumpController : MonoBehaviour
     public void JumpEnd()
     {
         OnEndJump?.Invoke();
-        Debug.LogError("JumpEnd");
     }
 
     public void LandingStart()
     {
         OnStartLanding?.Invoke();
-        Debug.LogError("LandingStart");
     }
 }
