@@ -24,11 +24,15 @@ public class PlayerController : MonoBehaviour
     private Vector3 moveDir;
     private float turnSmoothVelocity;
     private float axisRun;
-    private bool isGrounded;
+    private bool isGrounded, isJumping, isLanding, canPressJumpBtn;
 
-
+    private void Start()
+    {
+        canPressJumpBtn = true;
+    }
 
     // Update is called once per frame
+    Coroutine startJump;
     private void Update()
     {
         CheckPlayerInGround();
@@ -37,54 +41,50 @@ public class PlayerController : MonoBehaviour
         movement = new Vector3(GameInputManager.Instance.CurrentProfile.Horizontal, 0, GameInputManager.Instance.CurrentProfile.Vertical);
         Vector3 direction = movement.normalized;
 
-        if (direction.magnitude >= 0.1f)
+        if (!isJumping && !isLanding)
         {
-            // animatorPlayer.applyRootMotion = false;
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
-
-            moveDir = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
-
-            animatorPlayer.SetFloat("Vertical", moveDir.magnitude);
-
-            if (GameInputManager.Instance.CurrentProfile.Run)
+            if (direction.magnitude >= 0.1f)
             {
-                float smoothDampRunUp = Mathf.Lerp(animatorPlayer.GetFloat("Run"), 1, 0.1f);
-                animatorPlayer.SetFloat("Run", smoothDampRunUp);
-                speed = runSpeed;
+                // animatorPlayer.applyRootMotion = false;
+                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+                transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+
+                moveDir = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
+
+                animatorPlayer.SetFloat("Vertical", moveDir.magnitude);
+
+                if (GameInputManager.Instance.CurrentProfile.Run)
+                {
+                    float smoothDampRunUp = Mathf.Lerp(animatorPlayer.GetFloat("Run"), 1, 0.1f);
+                    animatorPlayer.SetFloat("Run", smoothDampRunUp);
+                    speed = runSpeed;
+                }
+                else
+                {
+                    float smoothDampRunDown = Mathf.Lerp(animatorPlayer.GetFloat("Run"), 0, 0.1f);
+                    animatorPlayer.SetFloat("Run", smoothDampRunDown);
+                    speed = moveSpeed;
+                }
+
+                characterControllerPlayer.Move(moveDir.normalized * speed * Time.deltaTime);
             }
             else
             {
-                float smoothDampRunDown = Mathf.Lerp(animatorPlayer.GetFloat("Run"), 0, 0.1f);
-                animatorPlayer.SetFloat("Run", smoothDampRunDown);
-                speed = moveSpeed;
+                // animatorPlayer.applyRootMotion = true;
+                float smoothDampVerticalDOWN = Mathf.Lerp(animatorPlayer.GetFloat("Vertical"), 0, 0.1f);
+                animatorPlayer.SetFloat("Vertical", smoothDampVerticalDOWN);
+                animatorPlayer.SetFloat("Run", smoothDampVerticalDOWN);
             }
-
-            characterControllerPlayer.Move(moveDir.normalized * speed * Time.deltaTime);
-        }
-        else
-        {
-            // animatorPlayer.applyRootMotion = true;
-            float smoothDampVerticalDOWN = Mathf.Lerp(animatorPlayer.GetFloat("Vertical"), 0, 0.1f);
-            animatorPlayer.SetFloat("Vertical", smoothDampVerticalDOWN);
-            animatorPlayer.SetFloat("Run", smoothDampVerticalDOWN);
         }
 
         // -- Jump
-
-
-        if (animatorPlayer.GetBool("Jumping") == false)
+        if (animatorPlayer.GetBool("Jumping") == false && canPressJumpBtn)
         {
             if (GameInputManager.Instance.CurrentProfile.Jump && isGrounded)
             {
-                if (animJumpController.startJump)
-                {
-                    directionY = jumpForce;
-                    moveDir.x = 0;
-                    moveDir.z = 0;
-                    animJumpController.startJump = false;
-                }
+                startJump = StartCoroutine(StartJump());
+                canPressJumpBtn = false;
             }
         }
         directionY -= gravity * Time.deltaTime;
@@ -97,6 +97,25 @@ public class PlayerController : MonoBehaviour
         //     FireBullet.GetFromBool(AttackPoint.localPosition, AttackPoint.localRotation);
         // }
 
+    }
+
+    private IEnumerator StartJump()
+    {
+        isJumping = true;
+        animatorPlayer.SetTrigger("Jump");
+        yield return new WaitUntil(() => animJumpController.startJump == true);
+        directionY = jumpForce;
+        moveDir.x = 0;
+        moveDir.z = 0;
+        animJumpController.startJump = false;
+        isJumping = false;
+        yield return new WaitUntil(() => animJumpController.startLanding == true);
+        animJumpController.startLanding = false;
+        isLanding = true;
+        yield return new WaitUntil(() => animJumpController.endJump == true);
+        animJumpController.endJump = false;
+        isLanding = false;
+        canPressJumpBtn = true;
     }
 
     private void CheckPlayerInGround()
