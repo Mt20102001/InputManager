@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public class AnimController : MonoBehaviour
 {
     [SerializeField] private PlayerController PlayerController;
     [SerializeField] private Animator animatorPlayer;
-
-
+    [SerializeField] private Rig rigPlayer;
 
     private void Start()
     {
@@ -16,6 +16,7 @@ public class AnimController : MonoBehaviour
         PlayerController.OnRun += RunCallback;
         PlayerController.OnJump += JumpCallback;
         PlayerController.OnStatusJump += StatusJumpCallback;
+        PlayerController.OnAim += AimCallback;
     }
 
     // private float GetSmoothDamp(float startFloat, float endFloat)
@@ -62,6 +63,18 @@ public class AnimController : MonoBehaviour
         if (status.Equals("OnAir"))
         {
             animatorPlayer.SetBool("Jumping", true);
+        }
+    }
+
+    private void AimCallback(string status)
+    {
+        if (status.Equals("On"))
+        {
+            rigPlayer.weight = Mathf.MoveTowards(rigPlayer.weight, 1, 0.1f);
+        }
+        if (status.Equals("Off"))
+        {
+            rigPlayer.weight = Mathf.MoveTowards(rigPlayer.weight, 0, 0.1f);
         }
     }
 

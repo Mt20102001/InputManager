@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     public event System.Action<string> OnRun;
     public event System.Action OnJump;
     public event System.Action<string> OnStatusJump;
+    public event System.Action<string> OnAim;
 
     private void Start()
     {
@@ -103,20 +104,22 @@ public class PlayerController : MonoBehaviour
         // -- Aim
         if (GameInputManager.Instance.CurrentProfile.Aim)
         {
-            transform.rotation = Quaternion.Euler(0.0f, cam.eulerAngles.y, 0.0f);
+            OnAim?.Invoke("On");
+            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0.0f, cam.eulerAngles.y, 0.0f), 0.1f);
             cinemachineCameraOffsetPlayer.m_Offset = Vector3.MoveTowards(cinemachineCameraOffsetPlayer.m_Offset, new Vector3(0.76f, -0.18f, 9.16f), 0.1f);
             if (!aimImg.activeSelf)
             {
-                //aimImg.SetActive(true);
+                aimImg.SetActive(true);
             }
         }
         else
         {
+            OnAim?.Invoke("Off");
             transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
             cinemachineCameraOffsetPlayer.m_Offset = Vector3.MoveTowards(cinemachineCameraOffsetPlayer.m_Offset, Vector3.zero, 0.1f);
             if (aimImg.activeSelf)
             {
-                //aimImg.SetActive(false);
+                aimImg.SetActive(false);
             }
         }
 
