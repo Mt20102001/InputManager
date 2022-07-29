@@ -12,11 +12,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private float runSpeed;
     [SerializeField] private float jumpForce;
+    [SerializeField] private float fireRate;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform AttackPoint;
     [SerializeField] private Transform cam;
+    [SerializeField] private Transform startFirePoint;
+    [SerializeField] private Transform endFirePoint;
     [SerializeField] private float turnSmoothTime;
     [SerializeField] private float gravity;
+    [SerializeField] private float distanceBullet;
+
 
     private float directionY;
     private float speed;
@@ -26,12 +31,14 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded, isJumping, isLanding, canPressJumpBtn;
     private float targetAngle;
     private float angle;
+    private float lastShoot;
 
     public event System.Action<string, float> OnMove;
     public event System.Action<string> OnRun;
     public event System.Action OnJump;
     public event System.Action<string> OnStatusJump;
     public event System.Action<string> OnAim;
+    public event System.Action<Vector3, Vector3, float> OnShoot;
 
     private void Start()
     {
@@ -107,7 +114,7 @@ public class PlayerController : MonoBehaviour
             OnAim?.Invoke("On");
             transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0.0f, cam.eulerAngles.y, 0.0f), 0.1f);
             cinemachineCameraOffsetPlayer.m_Offset = Vector3.MoveTowards(cinemachineCameraOffsetPlayer.m_Offset, new Vector3(0.76f, -0.18f, 9.16f), 0.1f);
-            if (!aimImg.activeSelf)
+            if (!aimImg.activeSelf && cinemachineCameraOffsetPlayer.m_Offset.Equals(new Vector3(0.76f, -0.18f, 9.16f)))
             {
                 aimImg.SetActive(true);
             }
@@ -124,12 +131,23 @@ public class PlayerController : MonoBehaviour
         }
 
         // -- Fire
-        // if (GameInputManager.Instance.CurrentProfile.Fire)
-        // {
-        //     FireBullet.GetFromBool(AttackPoint.localPosition, AttackPoint.localRotation);
-        // }
+        if (GameInputManager.Instance.CurrentProfile.Aim)
+        {
+            if (GameInputManager.Instance.CurrentProfile.Fire)
+            {
+                if (Time.time > fireRate + lastShoot)
+                {
+                    //FireBullet.GetFromBool(AttackPoint.localPosition, AttackPoint.localRotation);
+                    //Debug.DrawRay(startFirePoint.position, (endFirePoint.position - startFirePoint.position), Color.red, distanceBullet);
+                    OnShoot?.Invoke(startFirePoint.position, (endFirePoint.position - startFirePoint.position), distanceBullet);
+                    lastShoot = Time.time;
+                }
+            }
+        }
 
     }
+
+
 
     private IEnumerator StartJump()
     {

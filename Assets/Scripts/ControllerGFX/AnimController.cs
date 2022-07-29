@@ -8,6 +8,10 @@ public class AnimController : MonoBehaviour
     [SerializeField] private PlayerController PlayerController;
     [SerializeField] private Animator animatorPlayer;
     [SerializeField] private Rig rigPlayer;
+    [SerializeField] private TwoBoneIKConstraint twoBoneIKConstraintPlayerForHandNoWeapon;
+    [SerializeField] private ParticleSystem muzzleEffect;
+    [SerializeField] private TrailRenderer bullet;
+    [SerializeField] private LayerMask Mask;
 
     private void Start()
     {
@@ -17,6 +21,7 @@ public class AnimController : MonoBehaviour
         PlayerController.OnJump += JumpCallback;
         PlayerController.OnStatusJump += StatusJumpCallback;
         PlayerController.OnAim += AimCallback;
+        PlayerController.OnShoot += ShootCallback;
     }
 
     // private float GetSmoothDamp(float startFloat, float endFloat)
@@ -70,12 +75,47 @@ public class AnimController : MonoBehaviour
     {
         if (status.Equals("On"))
         {
+            animatorPlayer.SetBool("Aimming", true);
+            animatorPlayer.SetFloat("Aim", 1);
             rigPlayer.weight = Mathf.MoveTowards(rigPlayer.weight, 1, 0.1f);
+            twoBoneIKConstraintPlayerForHandNoWeapon.weight = Mathf.MoveTowards(twoBoneIKConstraintPlayerForHandNoWeapon.weight, 1,0.01f);
+            animatorPlayer.SetLayerWeight(1, 1);
         }
         if (status.Equals("Off"))
         {
+            animatorPlayer.SetBool("Aimming", false);
+            animatorPlayer.SetFloat("Aim", 0);
             rigPlayer.weight = Mathf.MoveTowards(rigPlayer.weight, 0, 0.1f);
+            twoBoneIKConstraintPlayerForHandNoWeapon.weight = Mathf.MoveTowards(twoBoneIKConstraintPlayerForHandNoWeapon.weight, 0, 0.1f);
+            animatorPlayer.SetLayerWeight(1, 0);
         }
+        
+    }
+
+    private void ShootCallback(Vector3 startFirePoint, Vector3 dir, float dis)
+    {
+        muzzleEffect.Play();
+        animatorPlayer.SetTrigger("Shooting");
+        if (Physics.Raycast(startFirePoint, dir, out RaycastHit hit, float.MaxValue, Mask))
+        {
+            TrailRenderer trail = Instantiate(bullet, startFirePoint, Quaternion.identity);
+            StartCoroutine(SpawnTrailBullet(trail, hit));
+        }
+    }
+
+    private IEnumerator SpawnTrailBullet(TrailRenderer trail, RaycastHit hit)
+    {
+        float time = 0;
+        Vector3 startPoint = trail.transform.position;
+
+        while (time < 1)
+        {
+            trail.transform.position = Vector3.Lerp(startPoint, hit.point, time);
+            time += 40*Time.deltaTime / trail.time;
+
+            yield return null;
+        }
+        Destroy(trail.gameObject);
     }
 
     private float GetValueInputRunUp()
