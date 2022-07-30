@@ -82,7 +82,7 @@ public class AnimController : MonoBehaviour
         if (status.Equals("On"))
         {
             animatorPlayer.SetBool("Aimming", true);
-            animatorPlayer.SetFloat("Aim", 1);
+            
             headPlayer.weight = Mathf.MoveTowards(headPlayer.weight, 1, 0.1f);
             DirPlayer.weight = Mathf.MoveTowards(DirPlayer.weight, 1, 0.1f);
             leftHandPlayer.weight = Mathf.MoveTowards(leftHandPlayer.weight, 1, 0.1f);
@@ -92,7 +92,7 @@ public class AnimController : MonoBehaviour
         if (status.Equals("Off"))
         {
             animatorPlayer.SetBool("Aimming", false);
-            animatorPlayer.SetFloat("Aim", 0);
+            
             headPlayer.weight = Mathf.MoveTowards(headPlayer.weight, 0, 0.1f);
             DirPlayer.weight = Mathf.MoveTowards(DirPlayer.weight, 0, 0.1f);
             leftHandPlayer.weight = Mathf.MoveTowards(leftHandPlayer.weight, 0, 0.1f);
