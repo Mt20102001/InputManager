@@ -17,6 +17,8 @@ public class DesktopInput : MonoBehaviour, IInputProfile
 
     public bool Aim => Input.GetMouseButton(1);
 
+    public bool Pickup => Input.GetKeyDown(KeyCode.E);
+
     public float HorizontalCamera => Input.GetAxis("K_HorizontalCamera");
 
     public float VerticalCamera => Input.GetAxis("K_VerticalCamera");

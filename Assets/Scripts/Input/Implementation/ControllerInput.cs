@@ -18,6 +18,8 @@ public class ControllerInput : MonoBehaviour, IInputProfile
 
     public bool Aim => Input.GetAxis("RT") > 0;
 
+    public bool Pickup => Input.GetButtonDown("A_Button");
+
     public float HorizontalCamera => Input.GetAxis("J_RightHorizontal");
 
     public float VerticalCamera => Input.GetAxis("J_RightVertical");

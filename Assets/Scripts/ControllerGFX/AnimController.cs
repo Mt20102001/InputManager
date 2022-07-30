@@ -7,11 +7,16 @@ public class AnimController : MonoBehaviour
 {
     [SerializeField] private PlayerController PlayerController;
     [SerializeField] private Animator animatorPlayer;
-    [SerializeField] private Rig rigPlayer;
+    [SerializeField] private MultiAimConstraint headPlayer;
+    [SerializeField] private MultiAimConstraint DirPlayer;
+    [SerializeField] private MultiAimConstraint leftHandPlayer;
     [SerializeField] private TwoBoneIKConstraint twoBoneIKConstraintPlayerForHandNoWeapon;
+    [SerializeField] private TwoBoneIKConstraint twoBoneIKConstraintPlayerForHandPickup;
     [SerializeField] private ParticleSystem muzzleEffect;
     [SerializeField] private TrailRenderer bullet;
     [SerializeField] private LayerMask Mask;
+    [SerializeField] private bool pickUPDone = false;
+
 
     private void Start()
     {
@@ -22,6 +27,7 @@ public class AnimController : MonoBehaviour
         PlayerController.OnStatusJump += StatusJumpCallback;
         PlayerController.OnAim += AimCallback;
         PlayerController.OnShoot += ShootCallback;
+        PlayerController.OnPickup += PickupCallback;
     }
 
     // private float GetSmoothDamp(float startFloat, float endFloat)
@@ -77,7 +83,9 @@ public class AnimController : MonoBehaviour
         {
             animatorPlayer.SetBool("Aimming", true);
             animatorPlayer.SetFloat("Aim", 1);
-            rigPlayer.weight = Mathf.MoveTowards(rigPlayer.weight, 1, 0.1f);
+            headPlayer.weight = Mathf.MoveTowards(headPlayer.weight, 1, 0.1f);
+            DirPlayer.weight = Mathf.MoveTowards(DirPlayer.weight, 1, 0.1f);
+            leftHandPlayer.weight = Mathf.MoveTowards(leftHandPlayer.weight, 1, 0.1f);
             twoBoneIKConstraintPlayerForHandNoWeapon.weight = Mathf.MoveTowards(twoBoneIKConstraintPlayerForHandNoWeapon.weight, 1,0.01f);
             animatorPlayer.SetLayerWeight(1, 1);
         }
@@ -85,32 +93,59 @@ public class AnimController : MonoBehaviour
         {
             animatorPlayer.SetBool("Aimming", false);
             animatorPlayer.SetFloat("Aim", 0);
-            rigPlayer.weight = Mathf.MoveTowards(rigPlayer.weight, 0, 0.1f);
+            headPlayer.weight = Mathf.MoveTowards(headPlayer.weight, 0, 0.1f);
+            DirPlayer.weight = Mathf.MoveTowards(DirPlayer.weight, 0, 0.1f);
+            leftHandPlayer.weight = Mathf.MoveTowards(leftHandPlayer.weight, 0, 0.1f);
             twoBoneIKConstraintPlayerForHandNoWeapon.weight = Mathf.MoveTowards(twoBoneIKConstraintPlayerForHandNoWeapon.weight, 0, 0.1f);
             animatorPlayer.SetLayerWeight(1, 0);
         }
         
     }
 
-    private void ShootCallback(Vector3 startFirePoint, Vector3 dir, float dis)
+    private void ShootCallback(Vector3 startFirePoint, Vector3 endFirePoint)
     {
         muzzleEffect.Play();
         animatorPlayer.SetTrigger("Shooting");
-        if (Physics.Raycast(startFirePoint, dir, out RaycastHit hit, float.MaxValue, Mask))
+        TrailRenderer trail = Instantiate(bullet, startFirePoint, Quaternion.identity);
+        StartCoroutine(SpawnTrailBullet(trail, endFirePoint));
+        /*if (Physics.Raycast(startFirePoint, dir, out RaycastHit hit, float.MaxValue, Mask))
         {
-            TrailRenderer trail = Instantiate(bullet, startFirePoint, Quaternion.identity);
-            StartCoroutine(SpawnTrailBullet(trail, hit));
-        }
+        }*/
     }
 
-    private IEnumerator SpawnTrailBullet(TrailRenderer trail, RaycastHit hit)
+    private void PickupCallback(string status)
+    {
+        if (status.Equals("StartPickup"))
+        {
+            animatorPlayer.SetTrigger("Pickup");
+            //twoBoneIKConstraintPlayerForHandPickup.weight = Mathf.MoveTowards(twoBoneIKConstraintPlayerForHandPickup.weight, 1, 0.1f);
+        }
+        //if (pickUPDone)
+        //{
+        //    twoBoneIKConstraintPlayerForHandPickup.weight = Mathf.MoveTowards(twoBoneIKConstraintPlayerForHandPickup.weight, 0, 0.1f);
+        //}
+    }
+
+    private void StartPickupItem()
+    {
+        Debug.LogError("StartPickUp");
+        pickUPDone = false;
+    }
+
+    private void EndPickupItem()
+    {
+        Debug.LogError("EndPickUp");
+        pickUPDone = true;
+    }
+
+    private IEnumerator SpawnTrailBullet(TrailRenderer trail, Vector3 hit)
     {
         float time = 0;
         Vector3 startPoint = trail.transform.position;
 
         while (time < 1)
         {
-            trail.transform.position = Vector3.Lerp(startPoint, hit.point, time);
+            trail.transform.position = Vector3.Lerp(startPoint, hit, time);
             time += 40*Time.deltaTime / trail.time;
 
             yield return null;

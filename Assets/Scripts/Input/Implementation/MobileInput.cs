@@ -17,6 +17,8 @@ public class MobileInput : MonoBehaviour, IInputProfile
 
     public bool Aim => throw new System.NotImplementedException();
 
+    public bool Pickup => throw new System.NotImplementedException();
+
     public float HorizontalCamera => throw new System.NotImplementedException();
 
     public float VerticalCamera => throw new System.NotImplementedException();
