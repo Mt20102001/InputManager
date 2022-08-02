@@ -10,15 +10,15 @@ public class ControllerInput : MonoBehaviour, IInputProfile
 
     public float Vertical => Input.GetAxis("J_MainVertical");
 
-    public bool Fire => Input.GetButtonDown("X_Button");
+    public bool Fire => Input.GetButtonDown("RB");
 
-    public bool Jump => Input.GetButtonDown("Y_Button");
+    public bool Jump => Input.GetButtonDown("LB");
 
     public bool Run => Input.GetAxis("LT") > 0;
 
     public bool Aim => Input.GetAxis("RT") > 0;
 
-    public bool Pickup => Input.GetButtonDown("A_Button");
+    public bool Pickup => Input.GetButtonDown("X_Button");
 
     public float HorizontalCamera => Input.GetAxis("J_RightHorizontal");
 

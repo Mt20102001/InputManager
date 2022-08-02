@@ -13,7 +13,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float fireRate;
     [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private Transform AttackPoint;
     [SerializeField] private Transform cam;
     [SerializeField] private Transform startFirePoint;
     [SerializeField] private Transform endFirePoint;
