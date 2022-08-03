@@ -13,8 +13,8 @@ public class CombatPlayerController : MonoBehaviour
 
     public event System.Action<string> OnAim;
     public event System.Action<Vector3, Vector3> OnShoot;
+    public bool aimming;
 
-    private bool aimming;
     private float lastShoot;
 
     public void ClearEvent()
